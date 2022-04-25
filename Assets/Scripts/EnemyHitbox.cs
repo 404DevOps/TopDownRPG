@@ -17,4 +17,5 @@ public class EnemyHitbox : Collidable
             coll.SendMessage("ReceiveDamage", dmg);
         }
     }
+
 }
