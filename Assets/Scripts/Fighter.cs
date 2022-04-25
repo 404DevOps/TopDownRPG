@@ -13,6 +13,7 @@ public class Fighter : MonoBehaviour
 
     //push
     protected Vector3 pushDirection;
+    public float pushRecoverySpeed;
 
     protected virtual void ReceiveDamage(Damage dmg)
     {

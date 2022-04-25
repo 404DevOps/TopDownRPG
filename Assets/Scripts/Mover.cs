@@ -19,13 +19,22 @@ public abstract class Mover : Fighter
 
     protected virtual void UpdateMotor(Vector3 input)
     {
+        //Reset Movedelta
         moveDelta = new Vector3(input.x * xSpeed, input.y * ySpeed, 0);
 
+        //Swap sprite direction when going right or left
         if (moveDelta.x > 0)
             transform.localScale = Vector3.one;
         else if (moveDelta.x < 0)
             transform.localScale = new Vector3(-1, 1, 1);
 
+        // Add push vector, if any
+        moveDelta += pushDirection;
+
+        //reduce push force every frame based off recovery speed
+        pushDirection = Vector3.Lerp(pushDirection, Vector3.zero, pushRecoverySpeed);
+
+        //check if we can move in this direction by casting box there first.
         hit = Physics2D.BoxCast(transform.position, boxCollider.size, 0, new Vector2(0, moveDelta.y), Mathf.Abs(moveDelta.y * Time.deltaTime), LayerMask.GetMask("Actor", "Blocking"));
         if (hit.collider == null)
         {

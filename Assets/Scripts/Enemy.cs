@@ -15,15 +15,63 @@ public class Enemy : Mover
     private Transform playerTransform;
     private Vector3 startingPosition;
 
-    // Start is called before the first frame update
-    void Start()
+    //Hitbox
+    public ContactFilter2D filter;
+    private BoxCollider2D hitbox;
+    private Collider2D[] hits = new Collider2D[10];
+
+    protected override void Start()
     {
-        
+        base.Start();
+        playerTransform = GameManager.Instance.player.transform;
+        startingPosition = transform.position;
+        hitbox = transform.GetChild(0).GetComponent<BoxCollider2D>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate() 
     {
-        
+        //is player in range
+        if (Vector3.Distance(playerTransform.position, startingPosition) < chaseLenght)
+        {
+            if (Vector3.Distance(playerTransform.position, startingPosition) < triggerLenght)
+                chasing = true;
+
+            if (chasing)
+            {
+                if (!collidingWithPlayer)
+                {
+                    UpdateMotor((playerTransform.position - transform.position).normalized);
+                }
+            }
+            else
+            {
+                UpdateMotor((startingPosition - transform.position));
+            }
+        }
+        else 
+        {
+            UpdateMotor((startingPosition - transform.position));
+            chasing = false;
+        }
+
+        //check for overlaps
+        collidingWithPlayer = false;
+        boxCollider.OverlapCollider(filter, hits);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i] == null)
+                continue;
+
+            if(hits[i].tag == "Fighter" && hits[i].name == "Player")
+
+            hits[i] = null;
+        }
+    }
+
+    protected override void Death()
+    {
+        Destroy(gameObject);
+        GameManager.Instance.experience += xpValue;
+        GameManager.Instance.ShowText("+" + xpValue + " xp", 30, Color.magenta, transform.position, Vector3.up * 40, 1.0f);
     }
 }
