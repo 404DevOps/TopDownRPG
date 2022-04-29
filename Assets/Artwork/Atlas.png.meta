@@ -1309,7 +1309,7 @@ TextureImporter:
     second: pillar2_0
   - first:
       213: -2355505969325306380
-    second: chest_0
+    second: menu_0
   - first:
       213: 7830920448493193388
     second: Atlas_190
@@ -5170,7 +5170,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: chest_0
+      name: menu_0
       rect:
         serializedVersion: 2
         x: 224

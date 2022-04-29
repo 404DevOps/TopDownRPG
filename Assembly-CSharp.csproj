@@ -63,11 +63,12 @@
     <Compile Include="Assets\Scripts\FloatingText.cs" />
     <Compile Include="Assets\Scripts\Mover.cs" />
     <Compile Include="Assets\Scripts\Collectible.cs" />
+    <Compile Include="Assets\Scripts\EnemyHitbox.cs" />
     <Compile Include="Assets\Scripts\FloatingTextManager.cs" />
     <Compile Include="Assets\Scripts\Damage.cs" />
     <Compile Include="Assets\Scripts\Portal.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
-    <Compile Include="Assets\Scripts\EnemyHitbox.cs" />
+    <Compile Include="Assets\Scripts\CharacterMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

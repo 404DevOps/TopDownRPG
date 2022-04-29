@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     //References
     public Player player;
     public FloatingTextManager floatingTextManager;
+    public Weapon weapon;
 
     //Public Weapon weapon
 
@@ -44,6 +45,63 @@ public class GameManager : MonoBehaviour
         floatingTextManager.Show(msg, fontSize, color, position, motion, duration);
     }
 
+    //Upgrade Weapon
+    public bool TryUpgradeWeapon()
+    {
+        if (weaponPrices.Count <= weapon.weaponLevel)
+            return false;
+
+        if (gold >= weaponPrices[weapon.weaponLevel-1])
+        {
+            gold -= weaponPrices[weapon.weaponLevel-1];
+            weapon.UpgradeWeapon();
+            return true;
+        }
+
+        return false;
+    }
+
+    //experience system
+    public int GetCurrentLevel()
+    {
+        int r = 0;
+        int add = 0;
+        while (experience >= add)
+        {
+            add += xpTable[r];
+            r++;
+
+            if (r == xpTable.Count) //MaxLevel
+                return r;
+        }
+
+        return r;
+    }
+
+    public int GetXpToLevel(int level)
+    {
+        int r = 0;
+        int xp = 0;
+
+        while (r < level)
+        {
+            xp += xpTable[r];
+            r++;
+        }
+
+        return xp;
+    }
+
+    public void GrantXP(int xp)
+    {
+        int currLevel = GetCurrentLevel();
+        experience += xp;
+        if (currLevel < GetCurrentLevel())
+        {
+            player.OnLevelUp();
+        }
+    }
+
     public void SaveState()
     {
         SaveData saveData = new SaveData
@@ -51,7 +109,7 @@ public class GameManager : MonoBehaviour
             experience = experience,
             gold = gold,
             preferedSkin = 0,
-            weaponLevel = 0
+            weaponLevel = weapon.weaponLevel
         };
 
         PlayerPrefs.SetString("SaveData", saveData.ToString());
@@ -65,9 +123,15 @@ public class GameManager : MonoBehaviour
         SaveData saveData = JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString("SaveData"));
 
         //SetPlayerSkin
-        //SetWeaponLevel
+        
+        weapon.SetWeaponLevel(saveData.weaponLevel);
+
         gold = saveData.gold;
         experience = saveData.experience;
+
+        if(GetCurrentLevel() != 1)
+            player.SetLevel(GetCurrentLevel());
+
         Debug.Log("LoadState");
     }
 
