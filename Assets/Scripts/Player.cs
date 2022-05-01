@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,8 @@ public class Player : Mover
         base.Start();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
+        DontDestroyOnLoad(this);
+
     }
     private void FixedUpdate()
     {
@@ -17,6 +20,22 @@ public class Player : Mover
         float y = Input.GetAxisRaw("Vertical");
 
         UpdateMotor(new Vector3(x, y, 0));
+    }
+
+    public void Heal(int healingAmount)
+    {
+        if (hitpoint == maxHitpoint)
+            return;
+
+        hitpoint += healingAmount;
+
+        if (hitpoint > maxHitpoint)
+            hitpoint = maxHitpoint;
+
+            GameManager.Instance.ShowText("+" + healingAmount.ToString() + "hp", 25, Color.green, transform.position, Vector3.up * 30, 1.0f);
+
+        GameManager.Instance.OnHitpointChange(hitpoint, maxHitpoint);
+
     }
 
     public void SwapSprite(int skinId)
@@ -36,5 +55,11 @@ public class Player : Mover
         {
             OnLevelUp();
         }
+    }
+
+    protected override void ReceiveDamage(Damage dmg)
+    {
+        base.ReceiveDamage(dmg);
+        GameManager.Instance.OnHitpointChange(hitpoint, maxHitpoint);
     }
 }

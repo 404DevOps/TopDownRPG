@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class CameraMotor : MonoBehaviour
 {
-    public Transform cameraTarget;
+    private Transform cameraTarget;
     public Vector3 cameraOffset = new Vector3(0,0,-10);
     public float boundX = 0.15f;
     public float boundY = 0.05f;
 
+    private void Start()
+    {
+        cameraTarget = GameObject.Find("Player").transform;
+    }
 
     private void LateUpdate()
     {

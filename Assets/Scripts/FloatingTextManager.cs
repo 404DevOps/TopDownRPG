@@ -10,6 +10,10 @@ public class FloatingTextManager : MonoBehaviour
 
     private List<FloatingText> floatingTexts = new List<FloatingText>();
 
+    private void Start()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
     private void Update()
     {
         foreach (FloatingText ft in floatingTexts)

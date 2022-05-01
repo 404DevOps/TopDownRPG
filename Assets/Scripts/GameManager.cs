@@ -18,6 +18,9 @@ public class GameManager : MonoBehaviour
     public Player player;
     public FloatingTextManager floatingTextManager;
     public Weapon weapon;
+    public RectTransform hitpointBar;
+    public GameObject hud;
+    public GameObject menu;
 
     //Public Weapon weapon
 
@@ -30,14 +33,19 @@ public class GameManager : MonoBehaviour
         if (Instance != null)
         {
             Destroy(this.gameObject);
+            Destroy(floatingTextManager.gameObject);
+            Destroy(hud.gameObject);
+            Destroy(menu.gameObject);
+            Destroy(player.gameObject);
             return;
         }
-            
+
         Instance = this;
 
         DontDestroyOnLoad(this);
         //DeleteState();
         SceneManager.sceneLoaded += LoadState;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     public void ShowText(string msg, int fontSize, Color color, Vector3 position, Vector3 motion, float duration)
@@ -51,14 +59,20 @@ public class GameManager : MonoBehaviour
         if (weaponPrices.Count <= weapon.weaponLevel)
             return false;
 
-        if (gold >= weaponPrices[weapon.weaponLevel-1])
+        if (gold >= weaponPrices[weapon.weaponLevel - 1])
         {
-            gold -= weaponPrices[weapon.weaponLevel-1];
+            gold -= weaponPrices[weapon.weaponLevel - 1];
             weapon.UpgradeWeapon();
             return true;
         }
 
         return false;
+    }
+
+    public void OnHitpointChange(int hitpoint, int maxHitpoint)
+    {
+        float ratio = (float)hitpoint / (float)maxHitpoint;
+        hitpointBar.localScale = new Vector3(1, ratio, 1);
     }
 
     //experience system
@@ -99,10 +113,15 @@ public class GameManager : MonoBehaviour
         if (currLevel < GetCurrentLevel())
         {
             player.OnLevelUp();
+            OnHitpointChange(player.hitpoint,player.maxHitpoint);
         }
     }
 
-    public void SaveState()
+    public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        player.transform.position = GameObject.Find("SpawnPoint").transform.position;
+    }
+        public void SaveState()
     {
         SaveData saveData = new SaveData
         {
@@ -113,11 +132,12 @@ public class GameManager : MonoBehaviour
         };
 
         PlayerPrefs.SetString("SaveData", saveData.ToString());
-        Debug.Log("SaveState");
     }
 
-    public void LoadState(Scene scene, LoadSceneMode mode) 
+    public void LoadState(Scene scene, LoadSceneMode mode)
     {
+        SceneManager.sceneLoaded -= LoadState;
+
         if (!PlayerPrefs.HasKey("SaveData")) return;
         
         SaveData saveData = JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString("SaveData"));
@@ -131,8 +151,6 @@ public class GameManager : MonoBehaviour
 
         if(GetCurrentLevel() != 1)
             player.SetLevel(GetCurrentLevel());
-
-        Debug.Log("LoadState");
     }
 
     public void DeleteState()
