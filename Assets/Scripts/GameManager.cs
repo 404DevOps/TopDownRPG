@@ -21,8 +21,14 @@ public class GameManager : MonoBehaviour
     public RectTransform hitpointBar;
     public GameObject hud;
     public GameObject menu;
+    public Animator deathmenuAnimator;
 
-    //Public Weapon weapon
+    public void Respawn()
+    {
+        deathmenuAnimator.SetTrigger("hide");
+        SceneManager.LoadScene("Main");
+        player.Respawn();
+    }
 
     //Logic
     public int gold;
@@ -59,9 +65,9 @@ public class GameManager : MonoBehaviour
         if (weaponPrices.Count <= weapon.weaponLevel)
             return false;
 
-        if (gold >= weaponPrices[weapon.weaponLevel - 1])
+        if (gold >= weaponPrices[weapon.weaponLevel])
         {
-            gold -= weaponPrices[weapon.weaponLevel - 1];
+            gold -= weaponPrices[weapon.weaponLevel];
             weapon.UpgradeWeapon();
             return true;
         }

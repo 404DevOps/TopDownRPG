@@ -6,6 +6,7 @@ using UnityEngine;
 public class Player : Mover
 {
     private SpriteRenderer spriteRenderer;
+    private bool isAlive = true;
     protected override void Start()
     {
         base.Start();
@@ -19,7 +20,8 @@ public class Player : Mover
         float x = Input.GetAxisRaw("Horizontal");
         float y = Input.GetAxisRaw("Vertical");
 
-        UpdateMotor(new Vector3(x, y, 0));
+        if(isAlive)
+            UpdateMotor(new Vector3(x, y, 0));
     }
 
     public void Heal(int healingAmount)
@@ -36,6 +38,14 @@ public class Player : Mover
 
         GameManager.Instance.OnHitpointChange(hitpoint, maxHitpoint);
 
+    }
+
+    public void Respawn()
+    {
+        isAlive = true;
+        Heal(maxHitpoint);
+        lastImmune = Time.time;
+        pushDirection = Vector3.zero;
     }
 
     public void SwapSprite(int skinId)
@@ -59,7 +69,16 @@ public class Player : Mover
 
     protected override void ReceiveDamage(Damage dmg)
     {
-        base.ReceiveDamage(dmg);
-        GameManager.Instance.OnHitpointChange(hitpoint, maxHitpoint);
+        if (isAlive)
+        {
+            base.ReceiveDamage(dmg);
+            GameManager.Instance.OnHitpointChange(hitpoint, maxHitpoint);
+        }
+    }
+
+    protected override void Death()
+    {
+        isAlive = false;
+        GameManager.Instance.deathmenuAnimator.SetTrigger("show");
     }
 }
